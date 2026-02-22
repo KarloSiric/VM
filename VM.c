@@ -1,20 +1,35 @@
 /* VM.c */
+
 #include "VM.h"
+
+void execinstr( Instruction *ip ) {
+    
+    
+       
+}
 
 void executeprogram( VM *vm ) {
     Program *pp;
+    Instruction *ip;
+    int16 size;
     
     assert( vm && *vm->m );
-    
     pp = vm->m;
     
     while ( ( *pp != ( Opcode )hlt ) && ( *pp <= vm->b ) ) {
+        ip = ( Instruction * )pp;
+        size = map( ip->o );
+        execinstr( ip );
+        
+        ip( vm ) += size;
+        pp += size; 
         
     }
     
     if ( *pp > vm->b ) {
         segfault( vm );
     } 
+    
 }
 
 void error( VM *vm, Errorcode e ) {
@@ -34,35 +49,32 @@ void error( VM *vm, Errorcode e ) {
 }
 
 int16 map( Opcode o ) {
-	int16 n, ret = 0;
-	IM *p;
+    int16 n, ret = 0;
+    IM *p;
 
-	for ( n = IMs, p = instrmap; n; n--, p++ ) {
-		if ( p->o == o ) {
-			ret = p->size;
+    for ( n = IMs, p = instrmap; n; n--, p++ ) {
+        if ( p->o == o ) {
+            ret = p->size;
             break;
-		}
-	}
+        }
+    }
 
-	return ( int16 )ret;
+    return ( int16 )ret;
 }
 
 VM *virtualmachine( void ) {
-	VM *p;
+    VM *p;
     
-	p = ( VM * )malloc( sizeof( *p ) );
+    p = ( VM * )malloc( sizeof( *p ) );
 
-	if ( !p ) {
-		errno = ErrMem;
-		return (VM *)0;
-	}
+    if ( !p ) {
+        error( p, ErrMem );
+        return (VM *)0;
+    }
     
-    zero( (int8 * ) p, ( int16 )sizeof( *p ) );
+    zero( (int8 * ) p, ( int16 )sizeof( *p ) ); 
 
-	p->c.r.ip = 0;
-	p->c.r.sp = 0xFFFF;
-
-	return p;
+    return p;
 }
 
 Program *exampleprogram( VM *vm ) { 
@@ -74,8 +86,7 @@ Program *exampleprogram( VM *vm ) {
     si1 = map( mov );
     si2 = map( nop );
     
-    i1 = ( Instruction * )malloc( si1 );
-    i2 = ( Instruction * )malloc( si2 );
+    i2 = ( Instruction * )malloc( si2 ); 
     
     assert( i1 && i2 );
     
@@ -112,27 +123,27 @@ Program *exampleprogram( VM *vm ) {
     copy( program, $1 i2, 1 );
     
     vm->b = ( si1 + sa1 + si2 );
-    
+    ax( vm ) = ( Registers )vm->m;
+    sp( vm ) = ( Registers )-1;
+       
     free( i1 );
     free( i2 );
       
-    return ( vm->m );    
+    return ( vm->m );
 }
 
 
-
-
 int main( int argc, char *argv[] ) {
-	VM *vm;
-	Program *prog;
+    VM *vm;
+    Program *prog;
     
-	vm = virtualmachine();
+    vm = virtualmachine();
     printf( "VM = %p\n", ( void * )vm );
     
-	prog = exampleprogram( vm );
+    prog = exampleprogram( vm );
     printf( "prog = %p\n", ( void * )prog );
     
     printhex($1 prog, ( map( mov ) + map ( nop ) ), ' ' );
 
-	return 0;
+    return 0;
 }

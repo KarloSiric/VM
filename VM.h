@@ -21,6 +21,14 @@ typedef unsigned long long int int64;
 #define $c ( char * )
 #define $i ( int )
 
+// REGISTERS
+#define ax( x )             ( x->c.r.ax )
+#define bx( x )             ( x->c.r.bx )
+#define cx( x )             ( x->c.r.cx )
+#define dx( x )             ( x->c.r.dx )
+#define ip( x )             ( x->c.r.ip )
+#define sp( x )             ( x->c.r.sp )
+
 #define segfault( x )          error( ( x ), ErrSegv )
 
 #define ErrMem      0x01        // 00 01
@@ -47,17 +55,17 @@ typedef unsigned long long int int64;
  *
  */
 
-enum e_opcode {
-	mov = 0x01,
-	nop = 0x02,
+enum e_opcode {       
+    mov = 0x01,
+    nop = 0x02,
     hlt = 0x03,
 };
 
 typedef enum e_opcode Opcode;
 
 struct s_instrmap {
-	Opcode o;
-	int8 size;
+    Opcode o;
+    int8 size;
 };
 
 typedef struct s_instrmap IM;
@@ -65,8 +73,8 @@ typedef struct s_instrmap IM;
 typedef int8 Args;
 
 struct s_instruction {
-	Opcode o;
-	Args a[2];
+    Opcode o;
+    Args a[2];
 };
 
 typedef unsigned short int Reg;
@@ -80,25 +88,25 @@ typedef int8 Memory[( (unsigned short)( -1 ) )];
 typedef int8 Program;
 
 struct s_registers {
-	Reg ax;
-	Reg bx;
-	Reg cx;
-	Reg dx;
-	Reg sp;
-	Reg ip;
+    Reg ax;
+    Reg bx;
+    Reg cx;
+    Reg dx;
+    Reg sp;
+    Reg ip;
 };
 
 typedef struct s_registers Registers;
 
 struct s_cpu {
-	Registers r;
+    Registers r;
 };
 
 typedef struct s_cpu CPU;
 
 struct s_vm {
-	CPU c;
-	Memory m;
+    CPU c;
+    Memory m;
     int16 b;    // break line
 };
 
@@ -109,10 +117,12 @@ typedef Memory *Stack;
 #define IMs ( sizeof( instrmap ) / sizeof( struct s_instrmap ) )
 
 static IM instrmap[] = {
-	{ mov, 0x03 },
-	{ nop, 0x01 },
+    { mov, 0x03 },
+    { nop, 0x01 },
     { hlt, 0x01 }
 };
+
+void execinstr( Instruction * );
 
 void error( VM *, Errorcode );
 
@@ -123,5 +133,3 @@ VM *virtualmachine( void );
 int16 map( Opcode o );
 
 Program *exampleprogram( VM * );
-
-int main( int, char ** );
