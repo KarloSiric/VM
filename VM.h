@@ -31,13 +31,11 @@ typedef unsigned long long int int64;
 
 #define segfault( x )          error( ( x ), ErrSegv )
 
+
+#define NoErr       0x00        // 00 00
 #define ErrMem      0x01        // 00 01
 #define ErrArgs     0x02        // 00 10
 #define ErrSegv     0x04        // 01 00
-
-
-#define NoArgs      { 0x00, 0x00 }
-
 
 
 /*
@@ -70,11 +68,11 @@ struct s_instrmap {
 
 typedef struct s_instrmap IM;
 
-typedef int8 Args;
+typedef int16 Args;
 
 struct s_instruction {
     Opcode o;
-    Args a[2];
+    Args a[];
 };
 
 typedef unsigned short int Reg;
@@ -117,16 +115,16 @@ typedef Memory *Stack;
 #define IMs ( sizeof( instrmap ) / sizeof( struct s_instrmap ) )
 
 static IM instrmap[] = {
-    { mov, 0x03 },
-    { nop, 0x01 },
-    { hlt, 0x01 }
+    { mov, 0x03 },          // 3 bytes total for mov
+    { nop, 0x01 },          // 1 bytes total for nop
+    { hlt, 0x01 }           // 1 bytes total for hlt
 };
 
-void execinstr( Instruction * );
+void execinstr( VM *, Instruction * );
 
 void error( VM *, Errorcode );
 
-void executeprogram( VM * );
+void execute( VM * );
 
 VM *virtualmachine( void );
 

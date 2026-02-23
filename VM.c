@@ -2,13 +2,15 @@
 
 #include "VM.h"
 
-void execinstr( Instruction *ip ) {
+void execinstr( VM *vm, Instruction *ip ) {
+    
+    
     
     
        
 }
 
-void executeprogram( VM *vm ) {
+void execute( VM *vm ) {
     Program *pp;
     Instruction *ip;
     int16 size;
@@ -19,7 +21,7 @@ void executeprogram( VM *vm ) {
     while ( ( *pp != ( Opcode )hlt ) && ( *pp <= vm->b ) ) {
         ip = ( Instruction * )pp;
         size = map( ip->o );
-        execinstr( ip );
+        execinstr( vm, ip );
         
         ip( vm ) += size;
         pp += size; 
@@ -85,7 +87,8 @@ Program *exampleprogram( VM *vm ) {
     
     si1 = map( mov );
     si2 = map( nop );
-    
+     
+    i1 = ( Instruction * )malloc( si1 ); 
     i2 = ( Instruction * )malloc( si2 ); 
     
     assert( i1 && i2 );
@@ -101,30 +104,25 @@ Program *exampleprogram( VM *vm ) {
     i1->o = mov;
     sa1 = ( si1 - 1 );
     
-    if ( si1 ) {
-        a1 = ( Args *)malloc( sizeof( sa1 ) );
-        // 0000 0001 mov eax
-        // 0000 0000
-        // 0000 0005 mov eax, 0x05
-    }  
+    if ( sa1 ) { 
+        a1 = i1->a;
+        zero( a1, sa1 );
+        *a1 = 0x0005;
+    }
+    
+    assert( a1 );
+    
     ps = ( si1 + si2 );
     program = vm->m;
-    copy( program, $1 i1, 1 );
-    program++;
+    copy( program, $1 i1, si1 );
+    program += si1;
     
-    if ( a1 ) {
-        assert( a1 );
-        zero( a1, sa1 );
-        *a1         = 0x00;
-        *( a1 + 1 ) = 0x05;
-    }
-
     i2->o = nop;
-    copy( program, $1 i2, 1 );
+    copy( program, $1 i2, si2 );
     
     vm->b = ( si1 + sa1 + si2 );
-    ax( vm ) = ( Registers )vm->m;
-    sp( vm ) = ( Registers )-1;
+    ax( vm ) = ( Reg )*vm->m;
+    sp( vm ) = ( Reg )-1;
        
     free( i1 );
     free( i2 );
