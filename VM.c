@@ -2,12 +2,10 @@
 
 #include "VM.h"
 
-void execinstr( VM *vm, Instruction *ip ) {
-    
-    
-    
-    
-       
+void execinstr( VM *vm, Instruction *ip ) { 
+    /*
+      // @TODO(KARLO): to be implemented because right now it is still not done 
+    */ 
 }
 
 void execute( VM *vm ) {
@@ -71,7 +69,7 @@ VM *virtualmachine( void ) {
 
     if ( !p ) {
         error( p, ErrMem );
-        return (VM *)0;
+        // return (VM *)0;
     }
     
     zero( (int8 * ) p, ( int16 )sizeof( *p ) ); 

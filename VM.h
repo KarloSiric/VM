@@ -68,7 +68,7 @@ struct s_instrmap {
 
 typedef struct s_instrmap IM;
 
-typedef int16 Args;
+typedef int8 Args;
 
 struct s_instruction {
     Opcode o;
